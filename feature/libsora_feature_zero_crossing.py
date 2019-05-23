@@ -20,13 +20,15 @@ import matplotlib.pyplot as plt
 
 
 
+
 import os
 filePath = 'G:/lqp/librosa-demo/feature/wav_lqpB/'
 filenames = os.listdir(filePath)
 
 for filename in filenames:
-
-    # filename = r'1.wav'
+    # print(filenames)
+    # filename = filenames[2]
+    print(filename)
     # Load the example clip
     y, sr = librosa.load(filePath+filename)
     y = y-0.97*y
@@ -42,17 +44,17 @@ for filename in filenames:
     yt  = signal.filtfilt(b, a, y)
     y = yt
 
-    chroma_stft = librosa.feature.melspectrogram(y=y, sr=sr)
-    S,phase = librosa.magphase(librosa.stft(y))
-    rms = librosa.feature.rms(S=S)
-    print('rms.shape:',rms.shape)
+    S,phase = librosa.magphase(librosa.stft(y=y))
+    cent = flatness = librosa.feature.zero_crossing_rate(y)
+
+    print('rms.shape:',cent.shape)
 
     plt.figure()
     plt.subplot(211)
-    plt.semilogy(rms.T,label = 'RMS Energy')
+    plt.semilogy(cent.T,label = 'Spectral centroid')
+    plt.ylabel('Hz')
     plt.xticks([])
-    plt.xlim([0,rms.shape[-1]])
-    plt.legend(loc='best')
+    plt.xlim([0,cent.shape[-1]])
     plt.subplot(212)
     librosa.display.specshow(librosa.amplitude_to_db(S,ref=np.max),y_axis='log',x_axis='time')
     plt.title('log Power spectrogram')
